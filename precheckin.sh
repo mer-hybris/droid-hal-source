@@ -27,11 +27,10 @@ fi
 PATHS=""
 while read -r path || [[ -n "$path" ]]; do
     echo "Text read from file: $path"
-    PATHS="${PATHS} ${path//\//-}"
+    PATHS="${PATHS} $path"
 done < "$FILE"
 
-# Trim whitespaces
-PATHS=${PATHS# }
+# Trim the last space
 PATHS=${PATHS% }
 
 REQLIST=""
