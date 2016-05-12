@@ -46,7 +46,7 @@ Provides: droid-bin-src-full
 Group:  System
 AutoReqProv: no
 Requires(post): /bin/sh
-Requires: $REQLIST
+Requires: droid-bin-src $REQLIST
 Summary: Syspart source for all the $pkg src trees to be used for droid-side code building
 
 %description src-full
@@ -76,6 +76,18 @@ Summary: Syspart top level makefile to be used for droid-side code building
 Syspart top level makefile to be used for droid-side code building
 It is only meant for use in the OBS.
 
+%package src
+Provides: droid-bin-src
+Group:  System
+AutoReqProv: no
+Requires: droid-bin-srcutils droid-bin-src-makefile
+Requires(post): /bin/sh
+Summary: Syspart source for the device src tree to be used for droid-side code building
+
+%description src
+This is the src tree for the files in the root directory from the %device syspart manifest.
+It is only meant for use in the OBS.
+
 EOF
 
 
@@ -96,6 +108,13 @@ chown 399:399 /home/abuild/src/droid/Makefile
 %files src-makefile
 %defattr(-,root,root,-)
 /home/abuild/src/droid/Makefile
+
+%post src
+# The abuild user is not setup at post time so we use the numeric id
+chown -R 399:399 /home/abuild/src/droid/
+
+%files src -f rootdir.files
+%defattr(644,root,root,-)
 EOF
 
 for path in $PATHS
