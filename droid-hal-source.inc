@@ -155,7 +155,10 @@ mv %android_root/Makefile $RPM_BUILD_ROOT/home/abuild/src/droid/
 mkdir -p $RPM_BUILD_ROOT/usr/bin
 cp droid-make $RPM_BUILD_ROOT/usr/bin
 
-find $android_root -maxdepth 1 \( -type f -or -type l \) -print -exec mv {} $RPM_BUILD_ROOT/home/abuild/src/droid/ \; | sed 's ^'$android_root' /home/abuild/src/droid ' >> rootdir.files
+rf -rm tmp/
+mkdir tmp/
+
+find %android_root -maxdepth 1 \( -type f -or -type l \) -print -exec mv {} $RPM_BUILD_ROOT/home/abuild/src/droid/ \; | sed 's ^%android_root /home/abuild/src/droid ' >> tmp/rootdir.files
 
 %endif
 

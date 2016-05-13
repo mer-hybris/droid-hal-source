@@ -113,8 +113,9 @@ chown 399:399 /home/abuild/src/droid/Makefile
 # The abuild user is not setup at post time so we use the numeric id
 chown -R 399:399 /home/abuild/src/droid/
 
-%files src -f rootdir.files
-%defattr(644,root,root,-)
+%files src -f tmp/rootdir.files
+%defattr(-,root,root,-)
+
 EOF
 
 for path in $PATHS
