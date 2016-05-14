@@ -18,17 +18,11 @@ SPEC=${SPEC%.tmpl}
 # Only worthwhile if we need to optimise multiple packages
 # Do a manual one for prebuilts/ ?
 
-if [ -e "source.paths" ]; then
-    FILE="source.paths"
-else
-    FILE="dhs/source.paths"
-fi
-
 PATHS=""
 while read -r path || [[ -n "$path" ]]; do
     echo "Text read from file: $path"
     PATHS="${PATHS} $path"
-done < "$FILE"
+done < <(cat additional-source.paths dhs/source.paths 2>/dev/null)
 
 # Trim the last space
 PATHS=${PATHS% }
@@ -48,7 +42,6 @@ AutoReqProv: no
 Requires(post): /bin/sh
 Requires: droid-bin-src $REQLIST
 Summary: Syspart source for all the $pkg src trees to be used for droid-side code building
-
 %description src-full
 This is the full src tree for the %device syspart manifest.
 It is only meant for use in the OBS.
@@ -59,7 +52,6 @@ Group:  System
 AutoReqProv: no
 Requires(post): /bin/sh
 Summary: Utilities for droid-side code building for %{device}%{?device_variant}
-
 %description srcutils
 Summary: Utilities for using the syspart source for droid-side code building.
 This package is hardcoded for %{device}%{?device_variant}
@@ -71,7 +63,6 @@ Group:  System
 AutoReqProv: no
 Requires(post): /bin/sh
 Summary: Syspart top level makefile to be used for droid-side code building
-
 %description src-makefile
 Syspart top level makefile to be used for droid-side code building
 It is only meant for use in the OBS.
@@ -83,7 +74,6 @@ AutoReqProv: no
 Requires: droid-bin-srcutils droid-bin-src-makefile
 Requires(post): /bin/sh
 Summary: Syspart source for the device src tree to be used for droid-side code building
-
 %description src
 This is the src tree for the files in the root directory from the %device syspart manifest.
 It is only meant for use in the OBS.
@@ -123,7 +113,6 @@ do
     pkg=${path//\//-}
 
     cat <<EOF >> package-section
-
 %package src-$pkg
 Provides: droid-bin-src-$pkg
 Group:  System
@@ -131,7 +120,6 @@ AutoReqProv: no
 Requires: droid-bin-srcutils droid-bin-src-makefile
 Requires(post): /bin/sh
 Summary: Syspart source for the $pkg src tree to be used for droid-side code building
-
 %description src-$pkg
 This is the src tree for the $pkg subdirectory from the %device syspart manifest.
 It is only meant for use in the OBS.
@@ -142,10 +130,10 @@ cat <<EOF >>files-section
 %post src-$pkg
 # The abuild user is not setup at post time so we use the numeric id
 chown -R 399:399 /home/abuild/src/droid/$path
-
 %files src-$pkg
 %defattr(-,root,root,-)
 /home/abuild/src/droid/$path
+
 EOF
 
 done
