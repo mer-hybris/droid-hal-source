@@ -29,10 +29,8 @@ PATHS=${PATHS% }
 
 REQLIST=""
 for path in $PATHS; do
-    REQLIST="${REQLIST} %{dhs_feature}-${path//\//-},"
+    REQLIST="${REQLIST} %{dhs_feature}-${path//\//-}"
 done
-# Trim the last ,
-REQLIST=${REQLIST%,}
 
 cat <<EOF > package-section
 %package dhs-full
@@ -43,7 +41,7 @@ Provides: droid-bin-src-full
 Group:  System
 AutoReqProv: no
 Requires(post): /bin/sh
-Requires: %{dhs_feature}-dhs-rootdir $REQLIST
+Requires: %{dhs_feature}-dhs-rootdir$REQLIST
 Summary: Syspart source for all the src trees to be used for droid-side code building
 %description dhs-full
 This is the full src tree for the %{dhs_name} manifest.
