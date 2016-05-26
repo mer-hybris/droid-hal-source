@@ -51,20 +51,39 @@
 %define ha_device %{device}
 %endif
 
+%if 0%{?dhs_flavour:1}
+%define dhs_feature droid-src-%{dhs_flavour}
+%else
+%define dhs_feature droid-src
+%endif
+
+%define dhs_name %{dhs_feature}-%{ha_device}
+
+# if dhs_flavour is not defined, means we're building a generic droid-src, and
+# for backwards compatibility we'll need to provide droid-bin and others
+%if 0%{?dhs_flavour:1}
+%define dhs_legacy 0
+%else
+%define dhs_legacy 1
+%endif
+
 # Don't run strip
 %define __strip /bin/true
 
-Summary: 	Droid BIN package for %{ha_device}
+Summary: 	Droid SRC package for %{ha_device}%{?dhs_flavour:, %{dhs_flavour} flavour}
 License: 	BSD-3-Clause
-Name: 		droid-bin-%{ha_device}
-Version: 	0.0.6
+Name: 		%{dhs_name}
+Version: 	0.0.0.1
 # timestamped releases are used only for HADK (mb2) builds
 %if 0%{?_obs_build_project:1}
 Release:	1
 %else
 Release:	%(date +'%%Y%%m%%d%%H%%M')
 %endif
+Provides:	%{dhs_feature}
+%if %{dhs_legacy}
 Provides:	droid-bin
+%endif
 # The repo sync service on OBS prepares a 'source tarball' of the rpm
 # dir since we currently have a complex setup with subdirs which OBS
 # doesn't like. This is not a problem for local builds.
@@ -73,8 +92,8 @@ Source0: 	rpm.tar.bzip2
 # local builds don't mind if this is missing
 Source40:       repo.tar.bzip2
 # Reserve Source50 onwards
-# Allow device specific sources to be defined using dbd_sources
-%{?dbd_sources}
+# Allow device specific sources to be defined using dhs_sources
+%{?dhs_sources}
 
 Group:		System
 
@@ -87,7 +106,7 @@ Group:		System
 %description
 %{summary}.
 
-%if 0%{?dbd_src_trees:1}
+%if 0%{?dhs_trees:1}
 %include package-section
 %endif
 
@@ -137,12 +156,12 @@ EOF
 rm -rf $RPM_BUILD_ROOT
 
 # Support the building of src-* rpms and srcutils if they're wanted
-%if 0%{?dbd_src_trees:1}
+%if 0%{?dhs_trees:1}
 # To create a set of rpms that hold the *source* we move the subset of
 # src to the buildroot for packaging
 # These will be used to create buildroots for packages like droidmedia
 mkdir -p $RPM_BUILD_ROOT/home/abuild/src/droid
-for tree in %dbd_src_trees ; do
+for tree in %dhs_trees ; do
    d=$(dirname $tree)
    mkdir -p $RPM_BUILD_ROOT/home/abuild/src/droid/$d
    mv %android_root/$tree $RPM_BUILD_ROOT/home/abuild/src/droid/$d
@@ -168,6 +187,6 @@ find %android_root -maxdepth 1 \( -type f -or -type l \) -print -exec mv {} $RPM
 #files
 #defattr(-,root,root,-)
 
-%if 0%{?dbd_src_trees:1}
+%if 0%{?dhs_trees:1}
 %include files-section
 %endif
