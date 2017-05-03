@@ -5,7 +5,6 @@
 # device_pretty: User-visible model name of the device
 # vendor_pretty: User-visible manufacturer name of the device
 # hadk_make_target: the target used when running make in the HABUILD_SDK on the OBS. Defaults to "hybris-hal"
-# device_target_cpu: Used for native builds. Normally the nested droid build env will do an old-fashioned cross-compile and produce non-x86 binaries (default armv7hl). This can be set to tell OBS what arch the binaries are. Eg Android for Intel arch must set this.
 # device_variant: for AOSP this is used as the TARGET_BUILD_VARIANT for lunch
 
 %define __provides_exclude_from ^%{_libexecdir}/droid-hybris/.*$
@@ -17,17 +16,6 @@
 %define __provides_exclude_from ^/system/.*$
 %define __requires_exclude ^.*$
 %global debug_package %{nil}
-
-# On the OBS this package should be built in the i486 scheduler against
-# mer/sailfish *_i486 targets.
-# The prjconf should have an ExportFilter like this (mer/sailfish has this):
-#   ExportFilter: \.armv7hl\.rpm$ armv8el
-# We lie about our architecture and allows OBS to cross-publish this 486 cross-built spec to the armv7hl repos
-%if 0%{?device_target_cpu:1}
-%define _target_cpu %{device_target_cpu}
-%else
-%define _target_cpu armv7hl
-%endif
 
 # Support build info extracted from OBS builds too
 %if 0%{?_obs_build_project:1}
@@ -97,6 +85,9 @@ Source40:       repo.tar.bzip2
 
 Group:		System
 
+# droid-src does not build any binaries, just bundles sources
+BuildArch:      noarch
+
 # Ignore the rpmlint-* to avoid long RPMLINT reporting
 #!BuildIgnore: rpmlint-mini
 #!BuildIgnore: rpmlint-MeeGo
@@ -135,8 +126,6 @@ cp %{SOURCE40} %{SOURCE0}
 %endif
 
 %build
-
-echo _target_cpu is %{_target_cpu}
 
 # We'll hardcode the device/variant information into the droid-make
 # script This isn't trivially installable into the ubu-chroot so
