@@ -60,7 +60,7 @@
 
 Summary: 	Droid SRC package for %{ha_device}%{?dhs_flavour:, %{dhs_flavour} flavour}
 License: 	BSD-3-Clause
-Name: 		%{dhs_name}
+Name: 		%{dhs_name_hardcoded}
 Version: 	0.0.0.1
 # timestamped releases are used only for HADK (mb2) builds
 %if 0%{?_obs_build_project:1}
