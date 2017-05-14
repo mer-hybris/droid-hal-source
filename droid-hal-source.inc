@@ -4,6 +4,8 @@
 # hadk_make_target:  the target used when running make in the HABUILD_SDK on the
 #                      OBS. Defaults to "hybris-hal"
 # device_variant:    for AOSP this is used as the TARGET_BUILD_VARIANT for lunch
+# lunch_device:      cases where the lunch combo is different from device name.
+#                      For example, it's "aosp_f5121" for the "suzu" device
 
 %define __provides_exclude_from ^%{_libexecdir}/droid-hybris/.*$
 %define android_root .
@@ -135,7 +137,7 @@ cat <<"EOF" > droid-make
 # ubu-chroot with the correct lunch setup
 # It is only intended to run in the OBS builders
 
-exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{device}%{?device_variant}; make $*"
+exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; make $*"
 EOF
 
 ################
