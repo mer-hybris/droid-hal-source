@@ -1,11 +1,9 @@
 # This file should be %%included into a device specific spec file
 # where macros are defined:
-# device: should be the CM codename or the AOSP TARGET_PRODUCT
-# vendor: determine the directory used for ./device/<vendor>/<device>
-# device_pretty: User-visible model name of the device
-# vendor_pretty: User-visible manufacturer name of the device
-# hadk_make_target: the target used when running make in the HABUILD_SDK on the OBS. Defaults to "hybris-hal"
-# device_variant: for AOSP this is used as the TARGET_BUILD_VARIANT for lunch
+# device:            should be the CM codename or the AOSP TARGET_PRODUCT
+# hadk_make_target:  the target used when running make in the HABUILD_SDK on the
+#                      OBS. Defaults to "hybris-hal"
+# device_variant:    for AOSP this is used as the TARGET_BUILD_VARIANT for lunch
 
 %define __provides_exclude_from ^%{_libexecdir}/droid-hybris/.*$
 %define android_root .
