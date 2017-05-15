@@ -6,9 +6,9 @@ device
 external
 frameworks
 hardware
+kernel
 libcore
 libnativehelper
-kernel
 prebuilts/clang/linux-x86
 prebuilts/gcc/linux-x86
 prebuilts/misc
