@@ -137,7 +137,7 @@ cat <<"EOF" > droid-make
 # ubu-chroot with the correct lunch setup
 # It is only intended to run in the OBS builders
 
-exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; make $*"
+exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; mkdir tmp; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant} | awk '/TARGET_ARCH=/{ print > \"tmp/droid-env.conf\" } 1'; make $*"
 EOF
 
 ################
