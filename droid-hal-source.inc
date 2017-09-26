@@ -6,6 +6,8 @@
 # device_variant:    for AOSP this is used as the TARGET_BUILD_VARIANT for lunch
 # lunch_device:      cases where the lunch combo is different from device name.
 #                      For example, it's "aosp_f5121" for the "suzu" device
+# have_vendor_src_for_obs:
+#                    include a separately packaged vendor source for OBS builds
 
 %define __provides_exclude_from ^%{_libexecdir}/droid-hybris/.*$
 %define android_root .
@@ -88,6 +90,12 @@ Group:		System
 # droid-src does not build any binaries, just bundles sources
 BuildArch:      noarch
 
+%if 0%{?_obs_build_project:1}
+%if 0%{?have_vendor_src_for_obs:1}
+BuildRequires:  droid-system-vendor-obsbuild
+%endif
+%endif
+
 # Ignore the rpmlint-* to avoid long RPMLINT reporting
 #!BuildIgnore: rpmlint-mini
 #!BuildIgnore: rpmlint-MeeGo
@@ -119,6 +127,11 @@ tar xf %{SOURCE0} -C ../SOURCES
 rm -f %{SOURCE0}
 cp %{SOURCE40} %{SOURCE0}
 
+%if 0%{?have_vendor_src_for_obs:1}
+# Copy SW binaries to the build dir (provided by droid-system-vendor-obsbuild)
+cp -ar /vendor .
+%endif
+
 # In OBS the repo service leaves the rpm/* files for OBS and they just ^^
 # got unpacked to ../SOURCES ... but we're used to having an rpm/ dir
 # So if rpm/ is missing then we use ../SOURCES :
@@ -137,7 +150,7 @@ cat <<"EOF" > droid-make
 # ubu-chroot with the correct lunch setup
 # It is only intended to run in the OBS builders
 
-exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; mkdir tmp; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant} | awk '/TARGET_ARCH=/{ print > \"tmp/droid-env.conf\" } 1'; make $*"
+exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; make $*"
 EOF
 
 ################
