@@ -21,7 +21,11 @@ SPEC=${SPEC%.tmpl}
 PATHS=""
 while read -r path || [[ -n "$path" ]]; do
     echo "Text read from file: $path"
-    PATHS="${PATHS} $path"
+    if [ ! -d ../$path ]; then
+        echo "skipping non existent path: $path"
+    else
+        PATHS="${PATHS} $path"
+    fi
 done < <(cat additional-source.paths dhs/source.paths 2>/dev/null)
 
 # Trim the last space
