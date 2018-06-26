@@ -29,6 +29,9 @@
 %define _obs_build_count %(echo %{release} | awk -F . '{if (NF >= 3) print $3; else print $1 }')
 %define _obs_commit_count %(echo %{release} | awk -F . '{if (NF >= 2) print $2; else print $1 }')
 
+# We build noarch packages and some sources includes binaries as well
+%define _binaries_in_noarch_packages_terminate_build 0
+
 %if "%{_build_flavour}" == "release"
 %define _version_appendix (%{_target_cpu})
 %else
