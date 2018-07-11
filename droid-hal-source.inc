@@ -146,14 +146,22 @@ cp -ar /vendor .
 # We'll hardcode the device/variant information into the droid-make
 # script This isn't trivially installable into the ubu-chroot so
 # include the ubu-chroot command within it
-cat <<"EOF" > droid-make
+cat <<"EOF" > droid-cmd
 #!/bin/bash
 
-# This command runs a hardware-specific 'make' command inside the
+# This command runs a hardware-specific command inside the
 # ubu-chroot with the correct lunch setup
 # It is only intended to run in the OBS builders
 
-exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; make $*"
+exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; $*"
+EOF
+
+cat <<"EOF" > droid-make
+#!/bin/bash
+
+# This command runs make with droid-cmd. Provided for compatibility.
+
+exec droid-cmd "make $*"
 EOF
 
 ################
