@@ -11,6 +11,14 @@ FILES=(*.spec*)
 SPEC=${1:-${FILES[0]}}
 SPEC=${SPEC%.tmpl}
 
+PATH_FILES="additional-source.paths dhs/source.paths"
+# if the repo provides it's own source.paths use that one instead
+# this can be used for repo projects that differ from the usual
+# layout
+if [ -f source.paths ]; then
+    PATH_FILES="source.paths"
+fi
+
 # Order is (will be?) important.
 # A package should be created for each of these paths
 # Then files which have been mentioned are skipped in future packages
@@ -26,7 +34,7 @@ while read -r path || [[ -n "$path" ]]; do
     else
         PATHS="${PATHS} $path"
     fi
-done < <(cat additional-source.paths dhs/source.paths 2>/dev/null)
+done < <(cat $PATH_FILES 2>/dev/null)
 
 # Trim the last space
 PATHS=${PATHS% }
