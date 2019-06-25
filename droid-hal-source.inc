@@ -8,6 +8,11 @@
 #                      For example, it's "aosp_f5121" for the "suzu" device
 # have_vendor_src_for_obs:
 #                    include a separately packaged vendor source for OBS builds
+# post_build_actions:
+#                    Actions to be executed after the sources have been extracted
+#                    for example patches can be applied to the sources which are
+#                    then stored in the final rpm droid-src packages.
+
 
 %define __provides_exclude_from ^%{_libexecdir}/droid-hybris/.*$
 %define android_root .
@@ -155,6 +160,8 @@ cat <<"EOF" > droid-make
 
 exec ubu-chroot -r /srv/mer/sdks/ubu "%{?pre_actions}; source build/envsetup.sh; lunch %{?lunch_device}%{!?lunch_device:%{device}}%{?device_variant}; make $*"
 EOF
+
+%{?post_build_actions}
 
 ################
 %install
