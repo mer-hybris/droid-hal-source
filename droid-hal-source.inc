@@ -69,7 +69,7 @@
 %define __strip /bin/true
 
 Summary: 	Droid SRC package for %{ha_device}%{?dhs_flavour:, %{dhs_flavour} flavour}
-License: 	BSD-3-Clause
+License: 	BSD
 Name: 		%{dhs_name_hardcoded}
 Version: 	0.0.0.1
 # timestamped releases are used only for HADK (mb2) builds
