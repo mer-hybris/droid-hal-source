@@ -29,7 +29,7 @@ fi
 PATHS=""
 while read -r path || [[ -n "$path" ]]; do
     echo "Text read from file: $path"
-    if [ ! -d ../$path ]; then
+    if [ ! -d ../$path ] && [ ! -f ../$path ]; then
         echo "skipping non existent path: $path"
     else
         PATHS="${PATHS} $path"
@@ -41,7 +41,8 @@ PATHS=${PATHS% }
 
 REQLIST=""
 for path in $PATHS; do
-    REQLIST="${REQLIST} %{dhs_feature}-${path//\//-}"
+    REQLIST="${REQLIST} %{dhs_feature}-${path//[\/.]/-}"
+    REQLIST="${REQLIST,,}"
 done
 
 cat <<EOF > package-section
@@ -130,7 +131,8 @@ EOF
 
 for path in $PATHS
 do
-    pkg=${path//\//-}
+    pkg=${path//[\/.]/-}
+    pkg=${pkg,,}
 
     cat <<EOF >> package-section
 %package $pkg
