@@ -186,7 +186,9 @@ for tree in %dhs_trees ; do
 done
 
 # Top level makefile
+if [ -f %android_root/Makefile ]; then
 mv %android_root/Makefile $RPM_BUILD_ROOT/home/abuild/src/droid/
+fi
 
 # Install the droid-make helper
 mkdir -p $RPM_BUILD_ROOT/usr/bin

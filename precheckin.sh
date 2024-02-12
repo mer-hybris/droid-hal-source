@@ -29,7 +29,7 @@ fi
 PATHS=""
 while read -r path || [[ -n "$path" ]]; do
     echo "Text read from file: $path"
-    if [ ! -d ../$path ]; then
+    if [ ! -d ../$path ] && [ ! -f ../$path ]; then
         echo "skipping non existent path: $path"
     else
         PATHS="${PATHS} $path"
@@ -41,7 +41,8 @@ PATHS=${PATHS% }
 
 REQLIST=""
 for path in $PATHS; do
-    REQLIST="${REQLIST} %{dhs_feature}-${path//\//-}"
+    REQLIST="${REQLIST} %{dhs_feature}-${path//[\/.]/-}"
+    REQLIST="${REQLIST,,}"
 done
 
 cat <<EOF > package-section
@@ -70,6 +71,7 @@ Summary: Utilities for using the syspart source for droid-side code building.
 This package is hardcoded for %{device}%{?device_variant}
 It is only meant for use in the OBS.
 
+%if 0%{!?dhs_no_makefile:1}
 %package dhs-makefile
 Provides: %{dhs_feature}-dhs-makefile
 Group:  System
@@ -79,12 +81,16 @@ Summary: Top level makefile to be used for droid-side code building
 %description dhs-makefile
 Top level makefile to be used for droid-side code building
 It is only meant for use in the OBS.
+%endif
 
 %package dhs-rootdir
 Provides: %{dhs_feature}-dhs-rootdir
 Group:  System
 AutoReqProv: no
-Requires: %{dhs_feature}-dhs-utils %{dhs_feature}-dhs-makefile
+Requires: %{dhs_feature}-dhs-utils
+%if 0%{!?dhs_no_makefile:1}
+Requires: %{dhs_feature}-dhs-makefile
+%endif
 Requires(post): /bin/sh
 Summary: Top level source files for the device src tree to be used for droid-side code building
 %description dhs-rootdir
@@ -102,6 +108,7 @@ cat <<EOF >files-section
 %defattr(755,root,root,-)
 /usr/bin/droid-make
 
+%if 0%{!?dhs_no_makefile:1}
 %post dhs-makefile
 # The abuild user is not setup at post time so we use the numeric id
 chown 399:399 /home/abuild/src
@@ -111,6 +118,7 @@ chown 399:399 /home/abuild/src/droid/Makefile
 %files dhs-makefile
 %defattr(-,root,root,-)
 /home/abuild/src/droid/Makefile
+%endif
 
 %post dhs-rootdir
 # The abuild user is not setup at post time so we use the numeric id
@@ -123,14 +131,18 @@ EOF
 
 for path in $PATHS
 do
-    pkg=${path//\//-}
+    pkg=${path//[\/.]/-}
+    pkg=${pkg,,}
 
     cat <<EOF >> package-section
 %package $pkg
 Provides: %{dhs_feature}-$pkg
 Group:  System
 AutoReqProv: no
-Requires: %{dhs_feature}-dhs-utils %{dhs_feature}-dhs-makefile
+Requires: %{dhs_feature}-dhs-utils
+%if 0%{!?dhs_no_makefile:1}
+Requires: %{dhs_feature}-dhs-makefile
+%endif
 Requires(post): /bin/sh
 Summary: Source for the $pkg src tree to be used for droid-side code building
 %description $pkg
